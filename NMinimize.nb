@@ -1,0 +1,205 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 10.4' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[      7019,        197]
+NotebookOptionsPosition[      6628,        180]
+NotebookOutlinePosition[      6966,        195]
+CellTagsIndexPosition[      6923,        192]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"AppendTo", "[", 
+   RowBox[{"$Path", ",", 
+    RowBox[{"NotebookDirectory", "[", "]"}]}], "]"}], ";"}]], "Input",
+ CellChangeTimes->{{3.672921835623795*^9, 3.672921846856222*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"dataSet3", "=", 
+   RowBox[{"Import", "[", 
+    RowBox[{"\"\<ex6data3.mat\>\"", ",", "\"\<Data\>\""}], "]"}]}], 
+  ";"}], "\n", 
+ RowBox[{
+  RowBox[{"dataSet3X", "=", 
+   RowBox[{
+   "dataSet3", "\[LeftDoubleBracket]", "1", "\[RightDoubleBracket]"}]}], 
+  ";"}], "\n", 
+ RowBox[{
+  RowBox[{"dataSet3y", "=", 
+   RowBox[{
+    RowBox[{"Flatten", "[", 
+     RowBox[{
+     "dataSet3", "\[LeftDoubleBracket]", "2", "\[RightDoubleBracket]"}], 
+     "]"}], "/.", "\[VeryThinSpace]", 
+    RowBox[{"{", 
+     RowBox[{
+      RowBox[{"0.", "\[Rule]", 
+       RowBox[{"-", "1"}]}], ",", 
+      RowBox[{"1.", "\[Rule]", "1"}]}], "}"}]}]}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{"dataSet3CrossValX", "=", 
+   RowBox[{
+   "dataSet3", "\[LeftDoubleBracket]", "4", "\[RightDoubleBracket]"}]}], 
+  ";"}], "\n", 
+ RowBox[{
+  RowBox[{"dataSet3CrossValy", "=", 
+   RowBox[{
+    RowBox[{"Flatten", "[", 
+     RowBox[{
+     "dataSet3", "\[LeftDoubleBracket]", "3", "\[RightDoubleBracket]"}], 
+     "]"}], "/.", "\[VeryThinSpace]", 
+    RowBox[{"{", 
+     RowBox[{
+      RowBox[{"0.", "\[Rule]", 
+       RowBox[{"-", "1"}]}], ",", 
+      RowBox[{"1.", "\[Rule]", "1"}]}], "}"}]}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{"<<", "MathSVM`"}]}], "Input",
+ CellChangeTimes->{{3.672921835623795*^9, 3.672921846856222*^9}, 
+   3.672922732888091*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"gaussianKernel", "[", 
+   RowBox[{"x_", ",", "y_", ",", "\[Sigma]_"}], "]"}], ":=", 
+  RowBox[{"Exp", "[", 
+   RowBox[{"-", 
+    FractionBox[
+     RowBox[{
+      UnderoverscriptBox["\[Sum]", 
+       RowBox[{"k", "=", "1"}], 
+       RowBox[{"Length", "[", "x", "]"}]], 
+      SuperscriptBox[
+       RowBox[{"(", 
+        RowBox[{
+         RowBox[{"x", "\[LeftDoubleBracket]", "k", "\[RightDoubleBracket]"}], 
+         "-", 
+         RowBox[{
+         "y", "\[LeftDoubleBracket]", "k", "\[RightDoubleBracket]"}]}], ")"}],
+        "2"]}], 
+     RowBox[{"2", " ", 
+      SuperscriptBox["\[Sigma]", "2"]}]]}], "]"}]}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"SVMError", "[", 
+    RowBox[{"X_", ",", "y_", ",", "crossValX_", ",", "crossValy_", ",", 
+     RowBox[{"\[Sigma]_", "?", "NumericQ"}], ",", 
+     RowBox[{"\[ScriptCapitalC]_", "?", "NumericQ"}]}], "]"}], ":=", 
+   RowBox[{"Block", "[", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"gk", ",", "\[Theta]", ",", "prediction", ",", "hd", ",", 
+       RowBox[{"\[Tau]", "=", "0.1"}]}], "}"}], ",", "\[IndentingNewLine]", 
+     RowBox[{
+      RowBox[{"gk", "=", 
+       RowBox[{
+        RowBox[{"gaussianKernel", "[", 
+         RowBox[{"#1", ",", "#2", ",", "\[Sigma]"}], "]"}], "&"}]}], ";", 
+      "\[IndentingNewLine]", 
+      RowBox[{"\[Theta]", "=", 
+       RowBox[{"NonseparableSVM", "[", 
+        RowBox[{"X", ",", "y", ",", "\[ScriptCapitalC]", ",", "\[Tau]", ",", 
+         RowBox[{"KernelFunction", "\[Rule]", "gk"}]}], "]"}]}], ";", 
+      "\[IndentingNewLine]", 
+      RowBox[{"prediction", "=", 
+       RowBox[{
+        RowBox[{
+         RowBox[{"SVMClassify", "[", 
+          RowBox[{"gk", ",", "X", ",", "\[Theta]", ",", "y", ",", "#"}], 
+          "]"}], "&"}], "/@", "crossValX"}]}], ";", "\[IndentingNewLine]", 
+      RowBox[{"hd", "=", 
+       RowBox[{"HammingDistance", "[", 
+        RowBox[{"prediction", ",", "crossValy"}], "]"}]}], ";", 
+      "\[IndentingNewLine]", 
+      RowBox[{"Print", "[", 
+       RowBox[{
+       "\"\<Hamming distance \>\"", ",", "hd", ",", 
+        "\"\< with \[Sigma] = \>\"", ",", "\[Sigma]", ",", 
+        "\"\< and \[ScriptCapitalC] = \>\"", ",", "\[ScriptCapitalC]"}], 
+       "]"}], ";", "\[IndentingNewLine]", 
+      RowBox[{"Return", "[", "hd", "]"}], ";"}]}], "\[IndentingNewLine]", 
+    "]"}]}], ";"}]], "Input",
+ CellChangeTimes->{{3.672807277906753*^9, 3.672807410637423*^9}, {
+   3.672807441644793*^9, 3.672807472204445*^9}, 3.672809473465465*^9, {
+   3.6728137997862186`*^9, 3.672813804938285*^9}, {3.6728138444998627`*^9, 
+   3.672813850979878*^9}, {3.672814324659816*^9, 3.672814353092093*^9}, {
+   3.672822500009788*^9, 3.672822501577387*^9}, 3.6728225890183897`*^9, {
+   3.672823199464231*^9, 3.672823201880249*^9}, 3.6728233053204803`*^9, {
+   3.672823420600642*^9, 3.67282342437593*^9}, {3.672824781878134*^9, 
+   3.6728248011100388`*^9}, {3.672824848630026*^9, 3.6728248607095118`*^9}, 
+   3.672824897989978*^9, {3.6728290311363173`*^9, 3.672829059920093*^9}, 
+   3.672895495135352*^9, {3.672895548110228*^9, 3.672895553732139*^9}, {
+   3.672895605936941*^9, 3.672895607694515*^9}, 3.672906909727221*^9, {
+   3.672914462707767*^9, 3.6729144641794767`*^9}, 3.672921817272582*^9, {
+   3.672922917190942*^9, 3.67292292269442*^9}}],
+
+Cell[BoxData[
+ RowBox[{"Block", "[", 
+  RowBox[{
+   RowBox[{"{", 
+    RowBox[{"\[Sigma]", ",", "\[ScriptCapitalC]", ",", "\[Tau]"}], "}"}], ",",
+    "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"Optimization`NMinimizeDump`$DiagnosticLevel", "=", "0"}], ";", 
+    "\[IndentingNewLine]", 
+    RowBox[{"NMinimize", "[", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"SVMError", "[", 
+         RowBox[{
+         "dataSet3X", ",", "dataSet3y", ",", "dataSet3CrossValX", ",", 
+          "dataSet3CrossValy", ",", "\[Sigma]", ",", "\[ScriptCapitalC]"}], 
+         "]"}], ",", 
+        RowBox[{
+         RowBox[{"0.01", "\[LessEqual]", "\[Sigma]", "\[LessEqual]", "30"}], "&&", 
+         RowBox[{
+         "0.01", "\[LessEqual]", "\[ScriptCapitalC]", "\[LessEqual]", 
+          "30"}]}]}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{"\[Sigma]", ",", "\[ScriptCapitalC]"}], "}"}], ",", 
+      RowBox[{"StepMonitor", "\[Rule]", 
+       RowBox[{"Print", "[", "\"\<Step taken\>\"", "]"}]}], ",", 
+      RowBox[{"Method", "\[Rule]", "\"\<DifferentialEvolution\>\""}]}], 
+     "]"}]}]}], "]"}]], "Input",
+ CellChangeTimes->{{3.6729229132395563`*^9, 3.672922913462318*^9}}]
+},
+WindowSize->{840, 979},
+WindowMargins->{{Automatic, 146}, {Automatic, 0}},
+FrontEndVersion->"10.4 for Linux x86 (64-bit) (February 25, 2016)",
+StyleDefinitions->"Default.nb"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[558, 20, 214, 5, 32, "Input"],
+Cell[775, 27, 1356, 43, 143, "Input"],
+Cell[2134, 72, 658, 20, 62, "Input"],
+Cell[2795, 94, 2639, 53, 209, "Input"],
+Cell[5437, 149, 1187, 29, 143, "Input"]
+}
+]
+*)
+
